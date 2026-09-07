@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meeting.title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @top-center {
+                content: "{{ meeting.title }}";
+                font-size: 9pt;
+                color: #666;
+            }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .header .date {
+            font-size: 12pt;
+            color: #666;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            font-size: 14pt;
+            color: #1e40af;
+            border-bottom: 2px solid #dbeafe;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .section h3 {
+            font-size: 12pt;
+            color: #374151;
+            margin: 15px 0 10px 0;
+        }
+
+        .attendees {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .attendees ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .attendees li {
+            background-color: #e0e7ff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 10pt;
+            color: #3730a3;
+        }
+
+        .agenda-list, .decision-list, .followup-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .agenda-list li, .decision-list li, .followup-list li {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            border-left: 3px solid #64748b;
+        }
+
+        .discussion-point {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .discussion-point h3 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .discussion-point ul {
+            margin-left: 20px;
+        }
+
+        .discussion-point li {
+            margin-bottom: 5px;
+        }
+
+        .action-items {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .action-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d97706;
+            border-radius: 4px;
+            margin-right: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-task {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .action-meta {
+            font-size: 10pt;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .action-meta span {
+            margin-right: 15px;
+        }
+
+        .notes-section {
+            background-color: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+        }
+
+        .notes-list {
+            margin-left: 20px;
+        }
+
+        .notes-list li {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 9pt;
+            color: #9ca3af;
+        }
+
+        .empty-state {
+            color: #9ca3af;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ meeting.title }}</h1>
+        <div class="date">{{ meeting.date }}</div>
+    </div>
+
+    {% if meeting.attendees %}
+    <div class="section">
+        <h2>Attendees</h2>
+        <div class="attendees">
+            <ul>
+                {% for attendee in meeting.attendees %}
+                <li>{{ attendee }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if meeting.agenda_items %}
+    <div class="section">
+        <h2>Agenda</h2>
+        <ul class="agenda-list">
+            {% for item in meeting.agenda_items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if meeting.discussion_points %}
+    <div class="section">
+        <h2>Discussion Points</h2>
+        {% for point in meeting.discussion_points %}
+        <div class="discussion-point">
+            <h3>{{ point.topic }}</h3>
+            <ul>
+                {% for item in point.points %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if meeting.decisions %}
+    <div class="section">
+        <h2>Decisions Made</h2>
+        <ul class="decision-list">
+            {% for decision in meeting.decisions %}
+            <li>{{ decision }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if meeting.action_items %}
+    <div class="section">
+        <h2>Action Items</h2>
+        <div class="action-items">
+            {% for item in meeting.action_items %}
+            <div class="action-item">
+                <div class="action-checkbox"></div>
+                <div class="action-content">
+                    <div class="action-task">{{ item.task }}</div>
+                    <div class="action-meta">
+                        {% if item.assignee %}
+                        <span>👤 {{ item.assignee }}</span>
+                        {% endif %}
+                        {% if item.deadline %}
+                        <span>📅 {{ item.deadline }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if meeting.follow_ups %}
+    <div class="section">
+        <h2>Follow-ups</h2>
+        <ul class="followup-list">
+            {% for followup in meeting.follow_ups %}
+            <li>{{ followup }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if meeting.additional_notes %}
+    <div class="section">
+        <h2>Additional Notes</h2>
+        <div class="notes-section">
+            <ul class="notes-list">
+                {% for note in meeting.additional_notes %}
+                <li>{{ note }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if meeting.raw_text %}
+    <div class="section">
+        <h2>Raw Notes</h2>
+        <p style="white-space: pre-wrap; background: #f9fafb; padding: 15px; border-radius: 8px;">{{ meeting.raw_text }}</p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        Generated by Meeting Notes to PDF | {{ meeting.date }}
+    </div>
+</body>
+</html>
