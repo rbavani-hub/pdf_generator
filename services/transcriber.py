@@ -1,3 +1,6 @@
+
+
+
 """Audio transcription using faster-whisper for local speech-to-text."""
 
 import os
@@ -59,7 +62,7 @@ class AudioTranscriber:
             audio_path,
             language=language,
             beam_size=5,
-            vad_filter=True  # Voice Activity Detection for better quality
+            vad_filter=False
         )
 
         # Collect all segments
